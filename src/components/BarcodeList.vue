@@ -8,6 +8,7 @@ const emit = defineEmits<{ (event: 'select', barcode: string): void }>();
 <template>
   <dl v-if="barcodes">
     <div
+      class="item"
       v-for="barcode of barcodes"
       :key="barcode.date"
       @click="emit('select', barcode.value)"
@@ -21,3 +22,9 @@ const emit = defineEmits<{ (event: 'select', barcode: string): void }>();
     </div>
   </dl>
 </template>
+
+<style lang="css" scoped>
+.item + .item {
+  margin-top: 5px;
+}
+</style>

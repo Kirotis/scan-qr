@@ -1,0 +1,22 @@
+{
+  "name": "Progressive Web Apps Workshop",
+  "short_name": "PWA Workshop",
+  "lang": "en",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "black",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "513x513"
+    }
+  ]
+}
