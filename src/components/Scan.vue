@@ -15,6 +15,13 @@ const queryPermission = async () => {
       video: true,
       audio: false,
     });
+
+    const tracks = mediaStream.getVideoTracks();
+    if (tracks.length > 1) {
+      tracks.pop();
+      tracks.forEach((track) => mediaStream.removeTrack(track));
+    }
+
     if (!mediaStream.active) {
       throw new Error('mediaStream is none active');
     }
