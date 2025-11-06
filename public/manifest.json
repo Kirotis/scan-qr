@@ -1,6 +1,6 @@
 {
   "name": "Progressive Web Apps Workshop",
-  "short_name": "PWA Workshop",
+  "short_name": "QR Scan",
   "lang": "en",
   "start_url": "/",
   "display": "standalone",

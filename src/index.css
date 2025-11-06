@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'Visitor';
-  src: url(../public/Visitor.ttf);
+  src: url(../assets/Visitor.ttf);
 }
 
 @font-face {
   font-family: 'Pixeloza';
-  src: url(../public/Pixeloza02Skewo.otf);
+  src: url(../assets/Pixeloza02Skewo.otf);
 }
 
 @keyframes eplileptic {
