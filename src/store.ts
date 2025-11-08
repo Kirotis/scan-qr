@@ -1,13 +1,22 @@
-import { onMounted, ref, readonly } from 'vue';
+import { ref, readonly, provide, inject, type Ref } from 'vue';
 
 export interface Barcode {
   value: string;
   date: number;
 }
 
-export const useBarcodes = () => {
+interface BarcodeCTX {
+  barcodes: Readonly<Ref<readonly Barcode[]>>;
+  appendBarcode: (value: string) => number;
+  initBarcodes: VoidFunction
+}
+
+const key = Symbol('barcodes');
+
+export const provideBarcodes = () => {
   const barcodes = ref<Barcode[]>([]);
-  onMounted(() => {
+
+  const initBarcodes = () => {
     try {
       const storageBarcodes = JSON.parse(
         localStorage.getItem('barcodes')!,
@@ -16,17 +25,32 @@ export const useBarcodes = () => {
         barcodes.value = storageBarcodes;
       }
     } catch {}
-  });
+  };
 
   const appendBarcode = (value: string) => {
-    if (barcodes.value.push({ value, date: Date.now() }) > 50) {
+    const date = Date.now();
+    if (barcodes.value.push({ value, date }) > 50) {
       barcodes.value.shift();
     }
     localStorage.setItem('barcodes', JSON.stringify(barcodes.value));
+    return date
   };
 
-  return {
+  const store: BarcodeCTX = {
     barcodes: readonly(barcodes),
     appendBarcode,
+    initBarcodes,
   };
+
+  provide(key, store);
+
+  return store;
+};
+
+export const useBarcodes = () => {
+  const ctx = inject<BarcodeCTX>(key);
+  if (!ctx) {
+    throw new Error('Barcodes not providet');
+  }
+  return ctx;
 };

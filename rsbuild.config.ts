@@ -1,5 +1,6 @@
 import { defineConfig } from '@rsbuild/core';
 import { pluginVue } from '@rsbuild/plugin-vue';
+import { resolve } from 'path';
 
 export default defineConfig({
   html: {
@@ -9,21 +10,16 @@ export default defineConfig({
     templateParameters: { title: 'QR Scan' },
     mountId: 'root',
   },
+  resolve: { alias: { '@': resolve(__dirname, './src') } },
   plugins: [pluginVue()],
   server: {
-    base: '/',
-    printUrls: true,
     compress: false,
     cors: true,
-    port: 5173,
     headers: { 'Service-Worker-Allowed': '/' },
   },
   output: {
-    inlineScripts: true,
     injectStyles: true,
-    target: 'web',
-    filename: {
-      font: '[name][ext]',
-    },
+    inlineScripts: true,
+    filename: { font: '[name][ext]' },
   },
 });

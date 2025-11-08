@@ -5,7 +5,7 @@
 
 @font-face {
   font-family: 'Pixeloza';
-  src: url(../assets/Pixeloza02Skewo.otf);
+  src: url(../assets/Pixeloza.otf);
 }
 
 @keyframes eplileptic {
@@ -44,7 +44,6 @@
   --content-width: 100vw;
   --main-font: Visitor;
   --header-font: Pixeloza;
-  --text-font-size: 6rem;
 }
 * {
   padding: 0;
@@ -56,12 +55,12 @@
   font-family: var(--main-font, monospace);
   border: 0;
   outline: none;
+  overflow: hidden;
 }
 
 body {
   min-height: var(--content-height);
   min-width: var(--content-width);
-  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar {
@@ -74,6 +73,19 @@ body {
   background: var(--primary-color);
 }
 
+a:not(:disabled):active,
 button:not(:disabled):active {
   animation: eplileptic 100ms none 0s infinite;
+}
+
+a,
+button {
+  color: var(--primary-color);
+  text-decoration: solid;
+  font-size: 1.6rem;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
 }

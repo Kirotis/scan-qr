@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watchEffect } from 'vue';
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import QrScanner from 'qr-scanner';
+import { useBarcodes } from '@/store';
+import { useRouter } from 'vue-router';
 
-const emit = defineEmits<{ (e: 'scan', value: string): void }>();
+const { appendBarcode } = useBarcodes();
+const { push } = useRouter();
 
 const videoScanRef = useTemplateRef<HTMLVideoElement>('scan');
 const permissionStatus = ref<'loading' | 'off' | 'on'>('loading');
@@ -12,15 +15,12 @@ const queryPermission = async () => {
   permissionStatus.value = 'loading';
   try {
     const mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: false,
+      video: {
+        facingMode: 'environment',
+        width: 600,
+        height: 600,
+      },
     });
-
-    const tracks = mediaStream.getVideoTracks();
-    if (tracks.length > 1) {
-      tracks.pop();
-      tracks.forEach((track) => mediaStream.removeTrack(track));
-    }
 
     if (!mediaStream.active) {
       throw new Error('mediaStream is none active');
@@ -34,28 +34,31 @@ const queryPermission = async () => {
 };
 
 const startVideo = async () => {
-  if (videoScanRef.value) {
-    const mediaStream = await queryPermission();
-
-    videoScanRef.value.srcObject = mediaStream;
-    videoScanRef.value.play();
-
-    qrScanner = new QrScanner(
-      videoScanRef.value,
-      (result) => emit('scan', result.data),
-      {},
-    );
-    await qrScanner.start();
+  if (!videoScanRef.value) {
+    return;
   }
+  const mediaStream = await queryPermission();
+
+  videoScanRef.value.srcObject = mediaStream;
+  videoScanRef.value.play();
+
+  qrScanner = new QrScanner(
+    videoScanRef.value,
+    (result) => {
+      console.log({result})
+      const date = appendBarcode(result.data);
+      push({ params: { date }, name: 'Barcode' });
+    },
+    {},
+  );
+  await qrScanner.start();
 };
 
-watchEffect(async () => {
-  await startVideo();
-  return () => {
-    videoScanRef.value?.pause();
-    qrScanner?.stop();
-    qrScanner?.destroy();
-  };
+onMounted(startVideo);
+onUnmounted(() => {
+  videoScanRef.value?.pause();
+  qrScanner?.stop();
+  qrScanner?.destroy();
 });
 </script>
 
@@ -64,14 +67,10 @@ watchEffect(async () => {
     <video class="video" ref="scan"></video>
 
     <div v-if="permissionStatus === 'on'" class="pointer" />
-    <div v-else-if="permissionStatus === 'loading'">
-      <div class="loading">WAIT...</div>
+    <div v-else-if="permissionStatus === 'loading'" class="loading">
+      WAIT...
     </div>
-    <div v-else>
-      ERROR
-      <br />
-      <button @click="startVideo">Try again</button>
-    </div>
+    <button v-else @click="startVideo">ERROR! Try again</button>
   </div>
 </template>
 
