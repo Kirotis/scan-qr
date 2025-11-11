@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
+import SelectDevice from './components/SelectDevice.vue';
+import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import QrScanner from 'qr-scanner';
 import { useBarcodes } from '@/store';
 import { useRouter } from 'vue-router';
+import { useSelectedDeviceId, useVideoDevices } from './hooks';
 
 const { appendBarcode } = useBarcodes();
 const { push } = useRouter();
+const { fetchDevices, videoDevices } = useVideoDevices();
 
+const deviceId = useSelectedDeviceId();
 const videoScanRef = useTemplateRef<HTMLVideoElement>('scan');
 const permissionStatus = ref<'loading' | 'off' | 'on'>('loading');
 let qrScanner: QrScanner | undefined;
 
-const queryPermission = async () => {
+const getMediaStream = async () => {
   permissionStatus.value = 'loading';
   try {
     const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -19,6 +23,7 @@ const queryPermission = async () => {
         facingMode: 'environment',
         width: 600,
         height: 600,
+        deviceId: deviceId.value || undefined,
       },
     });
 
@@ -37,7 +42,7 @@ const startVideo = async () => {
   if (!videoScanRef.value) {
     return;
   }
-  const mediaStream = await queryPermission();
+  const mediaStream = await getMediaStream();
 
   videoScanRef.value.srcObject = mediaStream;
   videoScanRef.value.play();
@@ -45,7 +50,6 @@ const startVideo = async () => {
   qrScanner = new QrScanner(
     videoScanRef.value,
     (result) => {
-      console.log({result})
       const date = appendBarcode(result.data);
       push({ params: { date }, name: 'Barcode' });
     },
@@ -60,17 +64,36 @@ onUnmounted(() => {
   qrScanner?.stop();
   qrScanner?.destroy();
 });
+
+watch(deviceId, (value, prev) => {
+  if (value && value !== prev) {
+    startVideo();
+  }
+});
 </script>
 
 <template>
   <div class="container">
     <video class="video" ref="scan"></video>
 
-    <div v-if="permissionStatus === 'on'" class="pointer" />
+    <template v-if="permissionStatus === 'on'">
+      <div class="pointer" />
+      <SelectDevice v-model="deviceId" :options="videoDevices" />
+    </template>
     <div v-else-if="permissionStatus === 'loading'" class="loading">
       WAIT...
     </div>
-    <button v-else @click="startVideo">ERROR! Try again</button>
+    <button
+      v-else
+      @click="
+        () => {
+          startVideo();
+          fetchDevices();
+        }
+      "
+    >
+      ERROR! Try again
+    </button>
   </div>
 </template>
 

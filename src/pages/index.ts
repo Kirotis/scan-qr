@@ -3,7 +3,7 @@ import { createWebHistory, createRouter } from 'vue-router';
 import MainView from './Main.vue';
 import HistoryView from './History.vue';
 import BarcodeView from './Barcode.vue';
-import ScanView from './Scan.vue';
+import ScanView from './Scan/Scan.vue';
 
 const routes = [
   { name: 'Main', path: '/', component: MainView },

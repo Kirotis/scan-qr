@@ -1,4 +1,4 @@
-const cacheName = 'cache-v1';
+const cacheName = 'cache-v2';
 
 const routes = ['/', '/static/font/Pixeloza.otf', '/static/font/Visitor.ttf'];
 

@@ -11,7 +11,8 @@ interface BarcodeCTX {
   initBarcodes: VoidFunction
 }
 
-const key = Symbol('barcodes');
+const BARCODES_KEY = 'barcodes';
+const ctxKey = Symbol(BARCODES_KEY);
 
 export const provideBarcodes = () => {
   const barcodes = ref<Barcode[]>([]);
@@ -19,7 +20,7 @@ export const provideBarcodes = () => {
   const initBarcodes = () => {
     try {
       const storageBarcodes = JSON.parse(
-        localStorage.getItem('barcodes')!,
+        localStorage.getItem(BARCODES_KEY)!,
       ) as Barcode[];
       if (storageBarcodes?.length) {
         barcodes.value = storageBarcodes;
@@ -32,7 +33,7 @@ export const provideBarcodes = () => {
     if (barcodes.value.push({ value, date }) > 50) {
       barcodes.value.shift();
     }
-    localStorage.setItem('barcodes', JSON.stringify(barcodes.value));
+    localStorage.setItem(BARCODES_KEY, JSON.stringify(barcodes.value));
     return date
   };
 
@@ -42,13 +43,13 @@ export const provideBarcodes = () => {
     initBarcodes,
   };
 
-  provide(key, store);
+  provide(ctxKey, store);
 
   return store;
 };
 
 export const useBarcodes = () => {
-  const ctx = inject<BarcodeCTX>(key);
+  const ctx = inject<BarcodeCTX>(ctxKey);
   if (!ctx) {
     throw new Error('Barcodes not providet');
   }
