@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useBarcodes } from '../store';
+import { useBarcodes } from '@/context';
 import { computed } from 'vue';
 
 const { barcodes } = useBarcodes();
@@ -12,7 +12,7 @@ const dateDict = computed(() => {
 </script>
 
 <template>
-  <dl v-if="barcodes?.length" class="container">
+  <dl v-if="barcodes?.length" class="wrapper">
     <div class="item" v-for="(barcodes, date) in dateDict" :key="date">
       <dt>{{ date }}:</dt>
       <dd v-for="barcode in barcodes" :key="barcode.date">
@@ -27,7 +27,7 @@ const dateDict = computed(() => {
 </template>
 
 <style lang="css" scoped>
-.container {
+.wrapper {
   overflow-y: auto;
   width: 100%;
 }

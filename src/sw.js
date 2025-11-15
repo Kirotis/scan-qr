@@ -28,7 +28,8 @@ self.addEventListener('fetch', (event) => {
       return cachedResponse;
     }
     const responce = await fetch(event.request);
-    if (event.request.url.test(/^.*\.(js|ts|otf|ttf|html|css)/)) {
+
+    if (/^.*\.(js|ts|otf|ttf|html|css)/.test(event.request.url)) {
       caches
         .open(cacheName)
         .then((cache) => cache.put(event.request, responce.clone()));

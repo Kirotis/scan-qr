@@ -1,5 +1,6 @@
 import { defineConfig } from '@rsbuild/core';
 import { pluginVue } from '@rsbuild/plugin-vue';
+import { pluginBasicSsl } from '@rsbuild/plugin-basic-ssl';
 import { resolve } from 'path';
 
 export default defineConfig({
@@ -11,7 +12,7 @@ export default defineConfig({
     mountId: 'root',
   },
   resolve: { alias: { '@': resolve(__dirname, './src') } },
-  plugins: [pluginVue()],
+  plugins: [pluginVue(), pluginBasicSsl()],
   server: {
     compress: false,
     cors: true,

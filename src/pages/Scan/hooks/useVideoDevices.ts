@@ -11,7 +11,6 @@ export const useVideoDevices = () => {
       videoDevices.value = devices.filter(
         (device) => device.kind === 'videoinput',
       );
-      console.log(videoDevices.value)
     } finally {
       isLoading.value = false;
     }

@@ -3,10 +3,17 @@ const model = defineModel<string | null>();
 const { options } = defineProps<{
   options: MediaDeviceInfo[] | null;
 }>();
+const emit = defineEmits<{
+  (event: 'change', deviceId: string): void;
+}>();
 </script>
 
 <template>
-  <select v-if="options?.length" v-model="model">
+  <select
+    v-if="options?.length"
+    v-model="model"
+    @change="emit('change', ($event.currentTarget as HTMLSelectElement)?.value)"
+  >
     <option
       v-for="option in options"
       :key="option.deviceId"

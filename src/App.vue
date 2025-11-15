@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { provideBarcodes } from './store';
-import Header from './widgets/Header.vue';
+import { provideBarcodes } from '@/context';
+import Header from '@/components/Header.vue';
 
 const { initBarcodes } = provideBarcodes();
 onMounted(initBarcodes);
@@ -23,9 +23,10 @@ onMounted(initBarcodes);
 }
 .header {
   z-index: 1;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
 }
 </style>
+./barcodes

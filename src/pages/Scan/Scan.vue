@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import SelectDevice from './components/SelectDevice.vue';
-import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import Snackbar from '@/components/Snackbar.vue';
+import { useBarcodes } from '@/context';
+import { throttle } from '@/utils';
 import QrScanner from 'qr-scanner';
-import { useBarcodes } from '@/store';
+import { onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import SelectDevice from './components/SelectDevice.vue';
 import { useSelectedDeviceId, useVideoDevices } from './hooks';
 
 const { appendBarcode } = useBarcodes();
-const { push } = useRouter();
+const router = useRouter();
 const { fetchDevices, videoDevices } = useVideoDevices();
-
 const deviceId = useSelectedDeviceId();
+
 const videoScanRef = useTemplateRef<HTMLVideoElement>('scan');
 const permissionStatus = ref<'loading' | 'off' | 'on'>('loading');
+const snackbarMessage = ref<string | null>(null);
 let qrScanner: QrScanner | undefined;
 
 const getMediaStream = async () => {
@@ -38,23 +41,31 @@ const getMediaStream = async () => {
   }
 };
 
+const handleQrResult = throttle(async (result: { data: string }) => {
+  const date = appendBarcode(result.data);
+  snackbarMessage.value = 'Scaned!!';
+  await new Promise((res) =>
+    watch(snackbarMessage, (value) => value === null && res(true), {
+      once: true,
+    }),
+  );
+  router.push({ params: { date }, name: 'Barcode' });
+}, 400);
+
 const startVideo = async () => {
   if (!videoScanRef.value) {
     return;
   }
   const mediaStream = await getMediaStream();
 
+  if (!deviceId.value) {
+    deviceId.value = mediaStream.getVideoTracks().at(0)?.id ?? null;
+  }
+
   videoScanRef.value.srcObject = mediaStream;
   videoScanRef.value.play();
 
-  qrScanner = new QrScanner(
-    videoScanRef.value,
-    (result) => {
-      const date = appendBarcode(result.data);
-      push({ params: { date }, name: 'Barcode' });
-    },
-    {},
-  );
+  qrScanner = new QrScanner(videoScanRef.value, handleQrResult, {});
   await qrScanner.start();
 };
 
@@ -64,22 +75,13 @@ onUnmounted(() => {
   qrScanner?.stop();
   qrScanner?.destroy();
 });
-
-watch(deviceId, (value, prev) => {
-  if (value && value !== prev) {
-    startVideo();
-  }
-});
 </script>
 
 <template>
-  <div class="container">
+  <div class="wrapper">
     <video class="video" ref="scan"></video>
 
-    <template v-if="permissionStatus === 'on'">
-      <div class="pointer" />
-      <SelectDevice v-model="deviceId" :options="videoDevices" />
-    </template>
+    <div class="pointer" v-if="permissionStatus === 'on'" />
     <div v-else-if="permissionStatus === 'loading'" class="loading">
       WAIT...
     </div>
@@ -94,11 +96,18 @@ watch(deviceId, (value, prev) => {
     >
       ERROR! Try again
     </button>
+    <SelectDevice
+      v-if="videoDevices?.length"
+      v-model="deviceId"
+      :options="videoDevices"
+      @change="startVideo"
+    />
+    <Snackbar v-model="snackbarMessage" />
   </div>
 </template>
 
 <style lang="css" scoped>
-.container {
+.wrapper {
   --video-size: 400px;
 
   position: relative;
