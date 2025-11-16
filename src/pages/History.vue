@@ -1,15 +1,8 @@
 <script lang="ts" setup>
-import { useBarcodes, type Barcode } from '@/context';
-import { computed, ref } from 'vue';
+import { useBarcodes } from '@/context';
+import { computed } from 'vue';
 
-// const { barcodes } = useBarcodes();
-const barcodes = ref(
-  Array.from({ length: 50 }, (_, index): Barcode => {
-    const date = new Date();
-    date.setDate(date.getDate() - index);
-    return { date: date.valueOf(), value: 'Index ' + index };
-  }),
-);
+const { barcodes } = useBarcodes();
 
 const dateDict = computed(() => {
   return Object.groupBy(barcodes.value, (barcode) =>
