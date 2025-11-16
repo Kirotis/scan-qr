@@ -111,6 +111,13 @@ onUnmounted(() => {
   --video-size: 400px;
 
   position: relative;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  height: 100%;
 }
 .video {
   width: var(--video-size);

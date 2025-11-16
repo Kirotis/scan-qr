@@ -9,6 +9,10 @@
 .content {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 20px;
+
+  height: 100%;
 }
 </style>

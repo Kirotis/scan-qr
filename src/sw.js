@@ -7,12 +7,15 @@ self.addEventListener('install', (event) => {
     caches
       .keys()
       .then((cacheNames) =>
-        Promise.all([
-          ...cacheNames.map((name) =>
-            name === cacheName ? Promise.resolve() : caches.delete(name),
-          ),
-          caches.open(cacheName).then((cache) => cache.addAll(routes)),
-        ]),
+        Promise.all(
+          cacheNames
+            .map((name) =>
+              name === cacheName ? Promise.resolve() : caches.delete(name),
+            )
+            .concat(
+              caches.open(cacheName).then((cache) => cache.addAll(routes)),
+            ),
+        ),
       ),
   );
 });

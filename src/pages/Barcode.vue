@@ -45,5 +45,6 @@ const copy = async () => {
   font-size: 1.6rem;
   word-break: break-all;
   margin: 0 15px;
+  padding-top: 40vh;
 }
 </style>

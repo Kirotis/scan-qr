@@ -8,25 +8,6 @@ onMounted(initBarcodes);
 </script>
 
 <template>
-  <Header class="header" />
-  <RouterView class="content" />
+  <Header />
+  <RouterView />
 </template>
-
-<style scoped>
-.content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  height: 100%;
-}
-.header {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-}
-</style>
-./barcodes

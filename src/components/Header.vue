@@ -16,6 +16,12 @@ const { back, currentRoute } = useRouter();
   display: flex;
   flex-direction: row-reverse;
   justify-content: space-between;
+
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 .container h3 {
   font-family: var(--header-font);
