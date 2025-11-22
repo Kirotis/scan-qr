@@ -5,7 +5,7 @@ import { computed } from 'vue';
 const { barcodes } = useBarcodes();
 
 const dateDict = computed(() => {
-  return Object.groupBy(barcodes.value, (barcode) =>
+  return Object.groupBy(barcodes.value.toReversed(), (barcode) =>
     new Date(barcode.date).toDateString(),
   );
 });
