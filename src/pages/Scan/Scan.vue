@@ -42,14 +42,21 @@ const getMediaStream = async () => {
 };
 
 const handleQrResult = throttle(async (result: { data: string }) => {
-  const date = appendBarcode(result.data);
-  snackbarMessage.value = 'Scaned!!';
-  await new Promise((res) =>
-    watch(snackbarMessage, (value) => value === null && res(true), {
-      once: true,
-    }),
-  );
-  router.push({ params: { date }, name: 'Barcode' });
+  try {
+    await qrScanner?.pause();
+
+    const date = appendBarcode(result.data);
+    snackbarMessage.value = 'Scaned!!';
+    await new Promise((res) =>
+      watch(snackbarMessage, (value) => value === null && res(true), {
+        once: true,
+      }),
+    );
+    router.push({ params: { date }, name: 'Barcode' });
+  } catch (err) {
+    console.error(err)
+    await qrScanner?.start();
+  }
 }, 400);
 
 const startVideo = async () => {
